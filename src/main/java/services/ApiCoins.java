@@ -31,13 +31,13 @@ public class ApiCoins {
     }
   }
 
-  public double requestQuote(String baseCurrency, String targetCurrency) {
+  public ExchangeRate requestConversion(String baseCurrency, String targetCurrency, Double amount) {
     if (this.apiKey == null || this.apiKey.isEmpty()) {
       System.out.println("API Key not found!");
-      return 0.0;
+      return null;
     }
 
-    String url = "https://v6.exchangerate-api.com/v6/" + apiKey + "/latest/" + baseCurrency;
+    String url = "https://v6.exchangerate-api.com/v6/" + apiKey + "/pair/" + baseCurrency + "/" + targetCurrency + "/" + amount;
 
     try {
       HttpClient httpClient = HttpClient.newHttpClient();
@@ -50,17 +50,16 @@ public class ApiCoins {
 
       if (httpResponse.statusCode() == 200) {
         ObjectMapper objectMapper = new ObjectMapper();
-        ExchangeRate exchangeRate = objectMapper.readValue(httpResponse.body(), ExchangeRate.class);
 
-        return exchangeRate.conversion_rates().getOrDefault(targetCurrency, 0.0);
+        return objectMapper.readValue(httpResponse.body(), ExchangeRate.class);
       }
 
       System.out.println("Error: " + httpResponse.statusCode());
-      return 0.0;
+      return null;
 
     } catch (Exception e) {
       System.out.println("Error: " + e.getMessage());
-      return 0.0;
+      return null;
     }
   }
 }
