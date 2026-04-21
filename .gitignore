@@ -5,7 +5,7 @@ target/
 .kotlin
 *.class
 .settings/
-.project
+config.properties
 
 
 ### IntelliJ IDEA ###
