@@ -2,6 +2,7 @@ package services;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import models.ExchangeRate;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -49,17 +50,16 @@ public class ApiCoins {
 
       if (httpResponse.statusCode() == 200) {
         ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode rootNode = objectMapper.readTree(httpResponse.body());
-        JsonNode ratesNode = rootNode.path("conversion_rates");
+        ExchangeRate exchangeRate = objectMapper.readValue(httpResponse.body(), ExchangeRate.class);
 
-        return ratesNode.path(targetCurrency).asDouble();
+        return exchangeRate.conversion_rates().getOrDefault(targetCurrency, 0.0);
       }
 
       System.out.println("Error: " + httpResponse.statusCode());
       return 0.0;
 
     } catch (Exception e) {
-      System.out.println("Error: Connection error!");
+      System.out.println("Error: " + e.getMessage());
       return 0.0;
     }
   }
