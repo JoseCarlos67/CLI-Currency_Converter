@@ -13,13 +13,10 @@ import java.net.http.HttpResponse;
 import java.util.Properties;
 
 public class ApiCoins {
-  private static String apiKey;
 
-  public ApiCoins() {
-    apiKey = loadKey();
-  }
 
-  private String loadKey() {
+
+  private static String loadKey() {
     Properties properties = new Properties();
 
     try (FileInputStream file = new FileInputStream("config.properties")) {
@@ -32,6 +29,9 @@ public class ApiCoins {
   }
 
   public static ExchangeRate requestConversion(String baseCurrency, String targetCurrency, Double amount) {
+
+    String apiKey = loadKey();
+
     if (apiKey == null || apiKey.isEmpty()) {
       System.out.println("API Key not found!");
       return null;
