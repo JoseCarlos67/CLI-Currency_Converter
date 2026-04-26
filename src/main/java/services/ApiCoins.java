@@ -1,5 +1,6 @@
 package services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import models.ExchangeRate;
@@ -10,11 +11,13 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 public class ApiCoins {
-
-
+  private static String apiKey = loadKey();
+  private static ObjectMapper objectMapper = new ObjectMapper();
 
   private static String loadKey() {
     Properties properties = new Properties();
@@ -28,38 +31,69 @@ public class ApiCoins {
     }
   }
 
-  public static ExchangeRate requestConversion(String baseCurrency, String targetCurrency, Double amount) {
-
-    String apiKey = loadKey();
-
+  private static String sendRequest(String url) {
     if (apiKey == null || apiKey.isEmpty()) {
-      System.out.println("API Key not found!");
+      // refatorar para exiber na GUI
+      System.out.println("Erro: Api Key not found!");
       return null;
     }
 
-    String url = "https://v6.exchangerate-api.com/v6/" + apiKey + "/pair/" + baseCurrency + "/" + targetCurrency + "/" + amount;
-
     try {
       HttpClient httpClient = HttpClient.newHttpClient();
-      HttpRequest httpRequest = HttpRequest.newBuilder()
-              .uri(URI.create(url))
+      HttpRequest httpRequest = HttpRequest.newBuilder().uri(URI.create(url))
               .GET()
               .build();
 
-      HttpResponse<String> httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+      HttpResponse<String> httpResponse = httpClient
+              .send(httpRequest, HttpResponse.BodyHandlers.ofString());
 
       if (httpResponse.statusCode() == 200) {
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        return objectMapper.readValue(httpResponse.body(), ExchangeRate.class);
+        return httpResponse.body();
       }
 
       System.out.println("Error: " + httpResponse.statusCode());
       return null;
+    } catch (Exception e) {
+      System.out.println("Error:  " + e.getMessage());
+      return null;
+    }
+  }
 
+  public static ExchangeRate requestConversion(String baseCurrency, String targetCurrency, Double amount) {
+
+    String url = "https://v6.exchangerate-api.com/v6/" + apiKey + "/pair/" + baseCurrency + "/" + targetCurrency + "/" + amount;
+
+    String response = sendRequest(url);
+    try {
+      return objectMapper.readValue(response, ExchangeRate.class);
     } catch (Exception e) {
       System.out.println("Error: " + e.getMessage());
       return null;
     }
+  }
+
+  public static List<String> getSuportedCodes()  {
+    String url = "https://v6.exchangerate-api.com/v6/" + apiKey + "/codes";
+
+    String response = sendRequest(url);
+    System.out.println(response);
+
+    List<String> suportedCodes = new ArrayList<>();
+    JsonNode codesNode = null;
+
+    try {
+      JsonNode rootNode = objectMapper.readTree(response);
+      codesNode = rootNode.path("supported_codes");
+    } catch (JsonProcessingException e) {
+      System.out.println("Error: " + e.getMessage());
+    }
+
+    if (codesNode.isArray()) {
+      for (JsonNode node : codesNode) {
+        suportedCodes.add(node.get(0).asText());
+      }
+    }
+
+    return suportedCodes;
   }
 }
