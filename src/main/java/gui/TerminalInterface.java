@@ -35,7 +35,7 @@ public class TerminalInterface extends BasicWindow {
       contentPanel.addComponent(comboBox1);
 
       contentPanel.addComponent(new Label("Value"));
-      TextBox inputValue = new TextBox();
+      TextBox inputValue = new TextBox("100.00");
       contentPanel.addComponent(inputValue);
 
       contentPanel.addComponent(new EmptySpace());
@@ -43,10 +43,13 @@ public class TerminalInterface extends BasicWindow {
       Label result = new Label("Result of conversion:");
 
       Button btnConverter = new Button("Convert", () -> {
-        double resultConversion = CurrencyConversionService.conversion(comboBox0.getText(), comboBox1.getText(), Double.parseDouble(inputValue.getText()));
+        double resultConversion = 0.0;
+        inputValue.setText(inputValue.getText().trim());
+        if (!inputValue.getText().isEmpty() || !inputValue.getText().equals("")){
+          resultConversion = CurrencyConversionService.conversion(comboBox0.getText(), comboBox1.getText(), Double.parseDouble(inputValue.getText()));
+        }
 
         result.setText("Result of conversion: " + resultConversion);
-
       });
       contentPanel.addComponent(btnConverter);
       contentPanel.addComponent(result);
@@ -64,11 +67,5 @@ public class TerminalInterface extends BasicWindow {
     } catch (IOException e) {
       System.out.println("Error: Error creating terminal -> " + e.getMessage());
     }
-  }
-
-  private void doSave() {
-  }
-
-  private void doOpen() {
   }
 }
