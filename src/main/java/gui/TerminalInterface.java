@@ -56,7 +56,7 @@ public class TerminalInterface extends BasicWindow {
           resultConversion = CurrencyConversionService.conversion(comboBox0.getText(), comboBox1.getText(), Double.parseDouble(inputValue.getText()));
         }
 
-        result.setText("Result of conversion: " + resultConversion);
+        result.setText(String.format("Result of conversion: " + String.format("%.2f", resultConversion)));
         result.setForegroundColor(TextColor.ANSI.GREEN_BRIGHT);
       });
 
