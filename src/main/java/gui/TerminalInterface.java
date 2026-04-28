@@ -1,7 +1,8 @@
 package gui;
 
-import com.googlecode.lanterna.SGR;
-import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TextColor;
+import com.googlecode.lanterna.graphics.SimpleTheme;
+import com.googlecode.lanterna.graphics.Theme;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
@@ -9,7 +10,6 @@ import services.ApiCoins;
 import services.CurrencyConversionService;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.Arrays;
 
 
@@ -20,11 +20,20 @@ public class TerminalInterface extends BasicWindow {
       screen.startScreen();
 
       WindowBasedTextGUI textGUI = new MultiWindowTextGUI(screen);
+      Theme customTheme = SimpleTheme.makeTheme(
+              true,
+              TextColor.ANSI.RED_BRIGHT, TextColor.ANSI.BLACK,
+              TextColor.ANSI.BLACK, TextColor.ANSI.RED_BRIGHT,
+              TextColor.ANSI.BLACK, TextColor.ANSI.RED_BRIGHT,
+              TextColor.ANSI.BLACK
+      );
+      textGUI.setTheme(customTheme);
       Window window = new BasicWindow("CURRENCY CONVERSION");
       window.setHints(Arrays.asList(Hint.CENTERED));
 
-
-      Panel contentPanel = new Panel(new GridLayout(2));
+      GridLayout grid = new GridLayout(2);
+      grid.setHorizontalSpacing(2);
+      Panel contentPanel = new Panel(grid);
 
       contentPanel.addComponent(new Label("Currency of origin"));
       ComboBox comboBox0 = new ComboBox<>(ApiCoins.getSuportedCodes());
@@ -38,8 +47,6 @@ public class TerminalInterface extends BasicWindow {
       TextBox inputValue = new TextBox("100.00");
       contentPanel.addComponent(inputValue);
 
-      contentPanel.addComponent(new EmptySpace());
-
       Label result = new Label("Result of conversion:");
 
       Button btnConverter = new Button("Convert", () -> {
@@ -50,8 +57,14 @@ public class TerminalInterface extends BasicWindow {
         }
 
         result.setText("Result of conversion: " + resultConversion);
+        result.setForegroundColor(TextColor.ANSI.GREEN_BRIGHT);
       });
+
+      contentPanel.addComponent(new EmptySpace());
       contentPanel.addComponent(btnConverter);
+      contentPanel.addComponent(new Separator(Direction.HORIZONTAL)
+              .setLayoutData(GridLayout.createLayoutData(
+                      GridLayout.Alignment.FILL, GridLayout.Alignment.CENTER, true, false, 2, 1)));
       contentPanel.addComponent(result);
       contentPanel.addComponent(new EmptySpace());
       contentPanel.addComponent(new EmptySpace());
@@ -59,10 +72,8 @@ public class TerminalInterface extends BasicWindow {
         window.close();
         System.exit(0);
       }));
-
       window.setComponent(contentPanel);
       textGUI.addWindowAndWait(window);
-
 
     } catch (IOException e) {
       System.out.println("Error: Error creating terminal -> " + e.getMessage());

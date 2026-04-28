@@ -1,6 +1,5 @@
 package services;
 
-import gui.TerminalInterface;
 import infra.LruCache;
 import models.ExchangeRate;
 
@@ -12,6 +11,5 @@ public class CurrencyConversionService {
 
     lruCache.put(exchangeRate.base_code() + "-" + exchangeRate.target_code(), exchangeRate.conversion_rate());
     return exchangeRate.conversion_result();
-
   }
 }
