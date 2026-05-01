@@ -101,7 +101,7 @@ public class TerminalInterface extends BasicWindow {
       contentPanel.addComponent(result);
       contentPanel.addComponent(new EmptySpace());
       contentPanel.addComponent(new EmptySpace());
-      contentPanel.addComponent(new Button("Fechar", ()-> {
+      contentPanel.addComponent(new Button("Exit", ()-> {
         window.close();
         System.exit(0);
       }));
