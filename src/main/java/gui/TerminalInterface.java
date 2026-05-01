@@ -4,6 +4,9 @@ import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.SimpleTheme;
 import com.googlecode.lanterna.graphics.Theme;
 import com.googlecode.lanterna.gui2.*;
+import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
+import com.googlecode.lanterna.gui2.dialogs.MessageDialogBuilder;
+import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import services.ApiCoins;
@@ -12,6 +15,7 @@ import services.JsonReaderService;
 import services.JsonWriterService;
 
 import java.io.IOException;
+import java.security.MessageDigest;
 import java.util.Arrays;
 
 
@@ -44,7 +48,15 @@ public class TerminalInterface extends BasicWindow {
       contentPanel.addComponent(inputApiKey);
 
       Button btnSaveKey = new Button("Save", () ->{
-        JsonWriterService.updateJsonFile(inputApiKey.getText());
+        MessageDialogButton resultSave = MessageDialog.showMessageDialog(
+                textGUI,
+                "Confirm",
+                "Do you want to save API Key?",
+                MessageDialogButton.Yes,
+                MessageDialogButton.No
+        );
+        if (resultSave == MessageDialogButton.Yes)
+          JsonWriterService.updateJsonFile(inputApiKey.getText());
       });
       contentPanel.addComponent(btnSaveKey);
 
@@ -72,8 +84,10 @@ public class TerminalInterface extends BasicWindow {
           result.setText(String.format("Result of conversion: " + String.format("%.2f", resultConversion)));
           result.setForegroundColor(TextColor.ANSI.GREEN_BRIGHT);
         } else {
-          result.setText("Result of conversion: API KEY NOT FOUND IN EXCHANGERATE-API");
+
+          result.setText("Result of conversion:");
           result.setForegroundColor(TextColor.ANSI.RED_BRIGHT);
+          MessageDialog.showMessageDialog(textGUI, "API Error", "API KEY NOT FOUND");
         }
       });
 

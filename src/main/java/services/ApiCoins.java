@@ -91,7 +91,6 @@ public class ApiCoins {
         suportedCodes.add(node.get(0).asText());
       }
     }
-
     return suportedCodes;
   }
 }
