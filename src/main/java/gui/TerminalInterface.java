@@ -17,6 +17,7 @@ import services.JsonWriterService;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.util.Arrays;
+import java.util.regex.Pattern;
 
 
 public class TerminalInterface extends BasicWindow {
@@ -69,7 +70,8 @@ public class TerminalInterface extends BasicWindow {
       contentPanel.addComponent(comboBox1);
 
       contentPanel.addComponent(new Label("Value"));
-      TextBox inputValue = new TextBox("100.00");
+      TextBox inputValue = new TextBox();
+      inputValue.setValidationPattern(Pattern.compile("^[1-9]*\\.?[1-9]*$"));
       contentPanel.addComponent(inputValue);
 
       Label result = new Label("Result of conversion:");
