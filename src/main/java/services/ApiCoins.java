@@ -51,15 +51,13 @@ public class ApiCoins {
         return httpResponse.body();
       }
 
-      System.out.println("Error: " + httpResponse.statusCode());
-      return null;
+      return httpResponse.body();
     } catch (Exception e) {
-      System.out.println("Error:  " + e.getMessage());
       return null;
     }
   }
 
-  public static ExchangeRate requestConversion(String baseCurrency, String targetCurrency, Double amount) {
+  public static ExchangeRate requestConversion(String apiKey, String baseCurrency, String targetCurrency, Double amount) {
 
     String url = "https://v6.exchangerate-api.com/v6/" + apiKey + "/pair/" + baseCurrency + "/" + targetCurrency + "/" + amount;
 

@@ -8,6 +8,8 @@ import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import services.ApiCoins;
 import services.CurrencyConversionService;
+import services.JsonReaderService;
+import services.JsonWriterService;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -35,6 +37,17 @@ public class TerminalInterface extends BasicWindow {
       grid.setHorizontalSpacing(2);
       Panel contentPanel = new Panel(grid);
 
+      Label apiKey = new Label ("API Key:");
+      contentPanel.addComponent(apiKey);
+      contentPanel.addComponent(new EmptySpace());
+      TextBox inputApiKey = new TextBox(JsonReaderService.apiKeySaved());
+      contentPanel.addComponent(inputApiKey);
+
+      Button btnSaveKey = new Button("Save", () ->{
+        JsonWriterService.updateJsonFile(inputApiKey.getText());
+      });
+      contentPanel.addComponent(btnSaveKey);
+
       contentPanel.addComponent(new Label("Currency of origin"));
       ComboBox comboBox0 = new ComboBox<>(ApiCoins.getSuportedCodes());
       contentPanel.addComponent(comboBox0);
@@ -50,14 +63,18 @@ public class TerminalInterface extends BasicWindow {
       Label result = new Label("Result of conversion:");
 
       Button btnConverter = new Button("Convert", () -> {
-        double resultConversion = 0.0;
+        Double resultConversion = 0.0;
         inputValue.setText(inputValue.getText().trim());
         if (!inputValue.getText().isEmpty() || !inputValue.getText().equals("")){
-          resultConversion = CurrencyConversionService.conversion(comboBox0.getText(), comboBox1.getText(), Double.parseDouble(inputValue.getText()));
+          resultConversion = CurrencyConversionService.conversion(inputApiKey.getText(), comboBox0.getText(), comboBox1.getText(), Double.parseDouble(inputValue.getText()));
         }
-
-        result.setText(String.format("Result of conversion: " + String.format("%.2f", resultConversion)));
-        result.setForegroundColor(TextColor.ANSI.GREEN_BRIGHT);
+        if (!(resultConversion == null)) {
+          result.setText(String.format("Result of conversion: " + String.format("%.2f", resultConversion)));
+          result.setForegroundColor(TextColor.ANSI.GREEN_BRIGHT);
+        } else {
+          result.setText("Result of conversion: API KEY NOT FOUND IN EXCHANGERATE-API");
+          result.setForegroundColor(TextColor.ANSI.RED_BRIGHT);
+        }
       });
 
       contentPanel.addComponent(new EmptySpace());
