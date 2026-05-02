@@ -2,7 +2,8 @@
 
 Um conversor de moedas interativo direto do seu terminal, desenvolvido em Java. Este projeto fornece uma interface gráfica de terminal, permitindo conversões de moedas em tempo real com performance graças ao uso de cache local.
 
-![Demonstração do CLI Currency Converter](link-para-o-seu-gif-aqui.gif)
+
+[![asciicast](https://asciinema.org/a/mcj3GmdGwevwHirs.svg)](https://asciinema.org/a/mcj3GmdGwevwHirs)
 
 ---
 ## ✨ Funcionalidades
