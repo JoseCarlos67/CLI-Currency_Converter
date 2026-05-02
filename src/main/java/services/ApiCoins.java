@@ -12,11 +12,12 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
 public class ApiCoins {
-  private static String apiKey = loadKey();
+  //private static String apiKey = loadKey();
   private static ObjectMapper objectMapper = new ObjectMapper();
 
   private static String loadKey() {
@@ -26,15 +27,12 @@ public class ApiCoins {
       properties.load(file);
       return properties.getProperty("exchange.api.key");
     } catch (IOException e) {
-      System.out.println("Error: The config.properties file could not be read!");
       return null;
     }
   }
 
-  private static String sendRequest(String url) {
+  private static String sendRequest(String apiKey, String url) {
     if (apiKey == null || apiKey.isEmpty()) {
-      // refatorar para exiber na GUI
-      System.out.println("Erro: Api Key not found!");
       return null;
     }
 
@@ -51,7 +49,7 @@ public class ApiCoins {
         return httpResponse.body();
       }
 
-      return httpResponse.body();
+      return null;
     } catch (Exception e) {
       return null;
     }
@@ -61,36 +59,37 @@ public class ApiCoins {
 
     String url = "https://v6.exchangerate-api.com/v6/" + apiKey + "/pair/" + baseCurrency + "/" + targetCurrency + "/" + amount;
 
-    String response = sendRequest(url);
+    String response = sendRequest(apiKey, url);
     try {
       return objectMapper.readValue(response, ExchangeRate.class);
     } catch (Exception e) {
-      System.out.println("Error: " + e.getMessage());
       return null;
     }
   }
 
-  public static List<String> getSuportedCodes()  {
+  public static List<String> getSupportedCodes(String apiKey) {
     String url = "https://v6.exchangerate-api.com/v6/" + apiKey + "/codes";
 
-    String response = sendRequest(url);
-    System.out.println(response);
+    String response = sendRequest(apiKey, url);
 
     List<String> suportedCodes = new ArrayList<>();
     JsonNode codesNode = null;
 
-    try {
-      JsonNode rootNode = objectMapper.readTree(response);
-      codesNode = rootNode.path("supported_codes");
-    } catch (JsonProcessingException e) {
-      System.out.println("Error: " + e.getMessage());
-    }
-
-    if (codesNode.isArray()) {
-      for (JsonNode node : codesNode) {
-        suportedCodes.add(node.get(0).asText());
+    if (!(response == null)) {
+      try {
+        JsonNode rootNode = objectMapper.readTree(response);
+        codesNode = rootNode.path("supported_codes");
+      } catch (JsonProcessingException e) {
+        return Collections.emptyList();
       }
+
+      if (codesNode.isArray()) {
+        for (JsonNode node : codesNode) {
+          suportedCodes.add(node.get(0).asText());
+        }
+      }
+      return suportedCodes;
     }
-    return suportedCodes;
+    return Collections.emptyList();
   }
 }
